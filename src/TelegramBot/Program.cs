@@ -18,7 +18,7 @@ builder.Services
     return new TelegramBotClient(botClientOptions, client);
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddHostedService<StartupService>();
 
 var app = builder.Build();
