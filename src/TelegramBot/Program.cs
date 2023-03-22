@@ -1,12 +1,22 @@
 using Microsoft.Extensions.Options;
+using Serilog;
 using Telegram.Bot;
 using TelegramBot.Model.Configurations;
-using TelegramBot.Services.Webhook;
+using TelegramBot.Services.Implementations.Requests;
+using TelegramBot.Services.Implementations.Webhook;
+using TelegramBot.Services.Interfaces.Requests;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var botConfigurationSection = builder.Configuration.GetSection(BotConfiguration.Configuration);
-builder.Services.Configure<BotConfiguration>(botConfigurationSection);
+builder.Host.UseSerilog();
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File("/app/logs/log.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.Console()
+    .CreateLogger();
+
+builder.Services.Configure<BotConfiguration>(builder.Configuration.GetSection(BotConfiguration.Configuration));
+builder.Services.Configure<AccessConfiguration>(builder.Configuration.GetSection(AccessConfiguration.Configuration));
 
 builder.Services
     .AddHttpClient("telegramBot")
@@ -17,7 +27,8 @@ builder.Services
 
     return new TelegramBotClient(botClientOptions, client);
 });
-
+builder.Services.AddTransient<IRequestFactory, RequestFactory>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddHostedService<StartupService>();
 
