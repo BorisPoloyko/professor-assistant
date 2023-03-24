@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  telegrambot:
+    image: ${DOCKER_REGISTRY-}telegrambot
+    ports:
+      - 32774:443
+      - 32775:80
+    volumes:
+      - TelegramBotLogs:/app/logs
+      - TelegramBotPhotos:/app/photos
+    build:
+      context: .
+      dockerfile: TelegramBot/Dockerfile
+volumes:
+  TelegramBotLogs:
+    external: true
+    name: TelegramBotLogs  
+  TelegramBotPhotos:
+    external: true
+    name: TelegramBotPhotos  
