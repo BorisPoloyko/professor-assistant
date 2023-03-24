@@ -2,7 +2,7 @@
 using Telegram.Bot;
 using TelegramBot.Model.Configurations;
 
-namespace TelegramBot.Services.Webhook
+namespace TelegramBot.Services.Implementations.Webhook
 {
     public class StartupService : IHostedService
     {
@@ -21,7 +21,8 @@ namespace TelegramBot.Services.Webhook
         {
             using var scope = _serviceProvider.CreateScope();
             var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-
+            _logger.LogWarning(_botConfigurations.WebhookUrl);
+            var info  = await botClient.GetWebhookInfoAsync(cancellationToken).ConfigureAwait(false);
             await botClient.SetWebhookAsync(_botConfigurations.WebhookUrl, cancellationToken: cancellationToken);
         }
 
@@ -29,7 +30,7 @@ namespace TelegramBot.Services.Webhook
         {
             using var scope = _serviceProvider.CreateScope();
             var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-
+            
             await botClient.DeleteWebhookAsync(cancellationToken: cancellationToken);
         }
     }
