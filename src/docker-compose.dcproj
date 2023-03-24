@@ -5,7 +5,7 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>a88a1904-5cfd-4778-92ce-5bf815e40aab</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/weatherforecast</DockerServiceUrl>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/api/bot/hello</DockerServiceUrl>
     <DockerServiceName>telegrambot</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
