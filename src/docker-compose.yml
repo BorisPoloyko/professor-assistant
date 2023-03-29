@@ -7,15 +7,36 @@ services:
       - 32774:443
       - 32775:80
     volumes:
-      - TelegramBotLogs:/app/logs
-      - TelegramBotPhotos:/app/photos
+      - telegramBotLogs:/app/logs
+      - telegramBotPhotos:/app/photos
     build:
       context: .
       dockerfile: TelegramBot/Dockerfile
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - 27017:27017
+    volumes:
+      - mongoDbData:/data/db
+  mongodb-express:
+    image: mongo-express
+    ports:
+      - 8080:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb
 volumes:
-  TelegramBotLogs:
+  telegramBotLogs:
     external: true
     name: TelegramBotLogs  
-  TelegramBotPhotos:
+  telegramBotPhotos:
     external: true
-    name: TelegramBotPhotos  
+    name: TelegramBotPhotos
+  mongoDbData:
+    external: true
+    name: MongoDbData  
