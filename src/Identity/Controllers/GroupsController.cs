@@ -1,6 +1,4 @@
-﻿using Identity.DataAccess.Implementations;
-using Identity.DataAccess.Interfaces;
-using Identity.Models.Students;
+﻿using Identity.DataAccess.Interfaces;
 using Identity.Models.UniversityGroups;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +23,21 @@ namespace Identity.Controllers
             {
                 var group = await _repository.FindUniversityGroup(query);
                 return Ok(group);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{groupId:long}")]
+        public async Task<ActionResult<UniversityGroup>> DeleteGroup([FromRoute] long groupId)
+        {
+            try
+            {
+                await _repository.DeleteGroup(groupId);
+                return Ok();
             }
             catch (Exception ex)
             {

@@ -12,5 +12,8 @@ namespace Identity.DataAccess.Interfaces
         Task AssignGroup(long studentId, int groupId);
 
         Task Update(Student student);
+        Task Delete(long studentId);
+
+        Task SaveChanges();
     }
 }

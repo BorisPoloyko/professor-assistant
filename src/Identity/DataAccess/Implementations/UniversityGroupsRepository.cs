@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Identity.DataAccess.Context;
 using Identity.DataAccess.Interfaces;
+using Identity.Models.Exceptions;
 using Identity.Models.UniversityGroups;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,9 +24,25 @@ namespace Identity.DataAccess.Implementations
             return await filteredGroups.AsNoTracking().SingleOrDefaultAsync();
         }
 
-        public async Task CreateGroup(UniversityGroup group)
+        public Task CreateGroup(UniversityGroup group)
         {
             _context.UniversityGroups.Add(group);
+            return Task.CompletedTask;
+        }
+
+        public async Task DeleteGroup(long groupId)
+        {
+            var group = await _context.UniversityGroups.FindAsync(groupId);
+            if (group == null)
+            {
+                throw new EntryNotFoundException($"Group with Id {groupId} not found");
+            }
+
+            _context.UniversityGroups.Remove(group);
+        }
+
+        public async Task SaveChanges()
+        {
             await _context.SaveChangesAsync();
         }
 
@@ -65,7 +82,5 @@ namespace Identity.DataAccess.Implementations
 
             return filteredGroups;
         }
-
-        
     }
 }

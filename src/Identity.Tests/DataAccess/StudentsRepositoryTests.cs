@@ -39,6 +39,7 @@ namespace Identity.Tests.DataAccess
             };
 
             await repository.AddStudent(student);
+            await repository.SaveChanges();
 
             Assert.Equal(1, context.Students.Count());
             Assert.Equal(1, context.UniversityGroups.Count());
@@ -60,7 +61,13 @@ namespace Identity.Tests.DataAccess
             };
 
             await repository.AddStudent(student);
-            await Assert.ThrowsAsync<DbUpdateException>(async () => await repository.AddStudent(student));
+            await repository.SaveChanges();
+
+            await Assert.ThrowsAsync<DbUpdateException>(async () =>
+            {
+                await repository.AddStudent(student);
+                await repository.SaveChanges();
+            });
         }
 
         [Fact]
@@ -111,6 +118,8 @@ namespace Identity.Tests.DataAccess
                 LastName = "Doe"
             });
 
+            await repository.SaveChanges();
+
             var dbStudent = await context.Students.FirstOrDefaultAsync();
             var dbGroup = await context.UniversityGroups.FirstOrDefaultAsync();
 
@@ -145,6 +154,8 @@ namespace Identity.Tests.DataAccess
 
             var repository = new StudentRepository(context);
             await repository.AssignGroup(1, 10);
+
+            await repository.SaveChanges();
 
             var dbStudent = await context.Students.Include(x => x.Group).FirstOrDefaultAsync();
             Assert.NotNull(dbStudent);

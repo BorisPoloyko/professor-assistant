@@ -33,14 +33,27 @@ namespace Identity.DataAccess.Implementations
 
             dbStudent.FirstName = student.FirstName;
             dbStudent.LastName = student.LastName;
+        }
 
+        public async Task Delete(long studentId)
+        {
+            var student = await _context.Students.FindAsync(studentId);
+            if (student == null)
+            {
+                throw new EntryNotFoundException($"Student with Id ${studentId} not found");
+            }
+
+            _context.Students.Remove(student);
+        }
+
+        public async Task SaveChanges()
+        {
             await _context.SaveChangesAsync();
         }
 
         public async Task AddStudent(Student student)
         {
             _context.Students.Add(student);
-            await _context.SaveChangesAsync();
         }
 
         public async Task AssignGroup(long studentId, int groupId)
@@ -62,7 +75,6 @@ namespace Identity.DataAccess.Implementations
             }
 
             student.Group = group;
-            await _context.SaveChangesAsync();
         }
     }
 }

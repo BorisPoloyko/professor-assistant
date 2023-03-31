@@ -6,5 +6,8 @@ namespace Identity.DataAccess.Interfaces
     {
         Task<UniversityGroup> FindUniversityGroup(FindUniversityGroupsQuery filter);
         Task CreateGroup(UniversityGroup group);
+        Task DeleteGroup(long groupId);
+
+        Task SaveChanges();
     }
 }

@@ -32,6 +32,7 @@ namespace Identity.Tests.DataAccess
             };
 
             await repository.CreateGroup(group);
+            await repository.SaveChanges();
 
             Assert.Equal(1, context.UniversityGroups.Count());
         }

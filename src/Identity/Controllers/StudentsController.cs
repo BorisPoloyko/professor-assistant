@@ -30,6 +30,8 @@ namespace Identity.Controllers
                 };
 
                 await _studentsRepository.AddStudent(student);
+                await _studentsRepository.SaveChanges();
+
                 return Ok();
             }
             catch (Exception e)
@@ -45,6 +47,25 @@ namespace Identity.Controllers
             try
             {
                 await _studentsRepository.Update(student);
+                await _studentsRepository.SaveChanges();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{studentId:long}")]
+        public async Task<ActionResult> DeleteStudent(Student student)
+        {
+            try
+            {
+                await _studentsRepository.Update(student);
+                await _studentsRepository.SaveChanges();
+
                 return Ok();
             }
             catch (Exception e)
@@ -61,6 +82,8 @@ namespace Identity.Controllers
             try
             {
                 await _studentsRepository.AssignGroup(studentId, groupId);
+                await _studentsRepository.SaveChanges();
+
                 return Ok();
             }
             catch (EntryNotFoundException e)
