@@ -89,6 +89,11 @@ namespace TelegramBot.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Testing endpoint that indicates that the application is running
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Hello(CancellationToken cancellationToken)
         {
