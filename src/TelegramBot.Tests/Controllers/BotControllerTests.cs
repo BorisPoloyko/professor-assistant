@@ -7,7 +7,6 @@ using Moq;
 using Telegram.Bot;
 using TelegramBot.Controllers;
 using TelegramBot.Services.Interfaces.Dialogs;
-using TelegramBot.Services.Interfaces.Requests;
 
 namespace TelegramBot.Tests.Controllers
 {
@@ -26,7 +25,7 @@ namespace TelegramBot.Tests.Controllers
         }
 
         [Fact]
-        public void HelloEndpoint_RetutnsOk()
+        public void HelloEndpoint_ReturnsOk()
         {
             var controller = new BotController(_botMock.Object, new NullLogger<BotController>(), _dialogFactoryMock.Object);
 

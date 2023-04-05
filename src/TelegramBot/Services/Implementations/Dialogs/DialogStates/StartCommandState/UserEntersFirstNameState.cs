@@ -1,21 +1,40 @@
-﻿using Telegram.Bot;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Telegram.Bot;
 using Telegram.Bot.Types;
+using TelegramBot.Services.Implementations.HttpClients;
 using TelegramBot.Services.Interfaces.Dialogs;
 using TelegramBot.Services.Interfaces.Dialogs.DialogStates;
 
 namespace TelegramBot.Services.Implementations.Dialogs.DialogStates.StartCommandState
 {
-    public class UserEntersFirstNameState : IDialogState
+    public class UserEntersFirstNameState : IStartCommandState
     {
-        public async Task Handle(Dialog dialog, Message message)
+        public ITelegramBotClient Bot { get; }
+        public StudentsClient StudentClient { get; }
+
+        public UserEntersFirstNameState(ITelegramBotClient client, StudentsClient studentClient)
         {
-            var firstName = message.Text;
-            if (dialog is InitializeUserDialog userDialog)
+            Bot = client;
+            StudentClient = studentClient;
+        }
+
+        public async Task Handle(InitializeUserDialog? dialog, Message message)
+        {
+            if (dialog == null)
             {
-                userDialog.FirstName = firstName;
+                throw new ArgumentNullException(nameof(dialog));
             }
-            await dialog.Bot.SendTextMessageAsync(dialog.UserId, "Please enter your last name");
-            dialog.State = new UserEntersLastNameState();
+
+            var firstName = message.Text;
+            dialog.FirstName = firstName;
+
+            await Bot.SendTextMessageAsync(dialog.UserId, "Please enter your last name");
+            dialog.State = new UserEntersLastNameState(Bot, StudentClient);
+        }
+
+        Task IDialogState.Handle(Dialog dialog, Message message)
+        {
+            return Handle(dialog as InitializeUserDialog, message);
         }
     }
 }

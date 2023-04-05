@@ -1,32 +1,59 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
+using TelegramBot.Model.Clients;
+using TelegramBot.Services.Implementations.HttpClients;
 using TelegramBot.Services.Interfaces.Dialogs;
-using TelegramBot.Services.Interfaces.Dialogs.DialogStates;
 
 namespace TelegramBot.Services.Implementations.Dialogs.DialogStates.StartCommandState
 {
-    public class UserEntersLastNameState : IDialogState
+    public class UserEntersLastNameState : IStartCommandState
     {
-        public async Task Handle(Dialog dialog, Message message)
+        public ITelegramBotClient Bot { get; }
+        public StudentsClient StudentClient { get; }
+
+        public UserEntersLastNameState(ITelegramBotClient client, StudentsClient studentClient)
         {
-            var lastName = message.Text;
-            var userDialog = dialog as InitializeUserDialog;
-            if (userDialog != null)
+            Bot = client;
+            StudentClient = studentClient;
+        }
+
+        public async Task Handle(InitializeUserDialog? dialog, Message message)
+        {
+            if (dialog == null)
             {
-                userDialog.LastName = lastName;
+                throw new ArgumentNullException(nameof(dialog));
             }
+
+            var lastName = message.Text;
+            dialog.LastName = lastName;
 
             try
             {
-                await dialog.FinishDialog();
+                await StudentClient.CreateOrUpdateStudent(new StudentDto
+                {
+                    Id = dialog.UserId,
+                    FirstName = dialog.FirstName,
+                    LastName = dialog.LastName
+                });
             }
-            catch (Exception ex)
+            catch
             {
-                await dialog.Bot.SendTextMessageAsync(dialog.UserId, "Unable to register user. Please repeat the process or contact administrator");
-                throw;
+                await Bot.SendTextMessageAsync(dialog.UserId,
+                    "Unable to register user. Please repeat the process or contact administrator");
+     
             }
-            await dialog.Bot.SendTextMessageAsync(dialog.UserId, $"Your are registered as {userDialog.FirstName} {userDialog.LastName}");
+            finally
+            {
+                dialog.Cache.Remove($"{dialog.UserId}_dialog");
+            }
+            await Bot.SendTextMessageAsync(dialog.UserId, $"Your are registered as {dialog.FirstName} {dialog.LastName}");
 
+            dialog.State = null;
+        }
+
+        public Task Handle(Dialog dialog, Message message)
+        {
+            return Handle(dialog as InitializeUserDialog, message);
         }
     }
 }

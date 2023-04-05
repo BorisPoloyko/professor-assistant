@@ -23,7 +23,8 @@ namespace TelegramBot.Services.Implementations.Dialogs
 
         public Dialog Create(string command, long userId) => command switch
         {
-            "start" => new InitializeUserDialog(userId, _bot, new InitialStartCommandState(), _cache, _studentsClient),
+            "start" => new InitializeUserDialog(userId, 
+                new InitialStartCommandState(_bot, _studentsClient), _cache),
             _ => throw new UnknownBotCommandException(command)
         };
 
