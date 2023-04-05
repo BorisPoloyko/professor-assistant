@@ -1,6 +1,6 @@
 ﻿namespace TelegramBot.Model.Clients
 {
-    public class StudentDto
+    public record StudentDto
     {
         public long Id { get; set; }
 

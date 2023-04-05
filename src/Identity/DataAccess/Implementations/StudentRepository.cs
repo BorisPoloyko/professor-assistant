@@ -17,7 +17,7 @@ namespace Identity.DataAccess.Implementations
 
         public async Task<Student?> FindStudent(long id)
         {
-            return await _context.Students.FindAsync(id);
+            return await _context.Students.Include(x => x.Group).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task Update(Student student)

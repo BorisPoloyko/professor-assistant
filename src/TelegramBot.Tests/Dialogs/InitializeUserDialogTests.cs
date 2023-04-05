@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -37,11 +32,31 @@ namespace TelegramBot.Tests.Dialogs
 
             await dialog.Handle(message);
             
-            Assert.Equal(typeof(UserEntersFirstNameState), dialog.State.GetType());
+            Assert.Equal(typeof(UserEntersFirstNameState), dialog.State?.GetType());
 
             await dialog.Handle(message);
 
-            Assert.Equal(typeof(UserEntersLastNameState), dialog.State.GetType());
+            Assert.Equal(typeof(UserEntersLastNameState), dialog.State?.GetType());
+
+            await dialog.Handle(message);
+
+            Assert.Null(dialog.State);
+        }
+
+        [Fact]
+        public async Task Handle_DialogInitialized_TelegramBotCalled()
+        {
+            var startState = new InitialStartCommandState(_botClientMock.Object, _studentsClientMock.Object);
+            var dialog = new InitializeUserDialog(_userId, startState, _memoryCache);
+            var message = new Message();
+
+            await dialog.Handle(message);
+
+            Assert.Equal(typeof(UserEntersFirstNameState), dialog.State?.GetType());
+
+            await dialog.Handle(message);
+
+            Assert.Equal(typeof(UserEntersLastNameState), dialog.State?.GetType());
 
             await dialog.Handle(message);
 

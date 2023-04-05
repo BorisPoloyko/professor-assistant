@@ -2,7 +2,7 @@
 {
     public interface IDialogFactory
     {
-        Dialog Create(string command, long userId);
-        Dialog Extract(long userId);
+        IDialog Create(string command, long userId);
+        IDialog Extract(long userId);
     }
 }

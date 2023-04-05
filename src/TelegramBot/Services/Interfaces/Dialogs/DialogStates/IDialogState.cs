@@ -4,9 +4,9 @@ namespace TelegramBot.Services.Interfaces.Dialogs.DialogStates
 {
     public interface IDialogState
     {
-        Task Handle(Dialog dialog, Message message);
+        Task Handle(IDialog dialog, Message message);
     }
-    public interface IDialogState<in T> : IDialogState where T : Dialog
+    public interface IDialogState<in T> : IDialogState where T : IDialog
     {
         Task Handle(T dialog, Message message);
     }

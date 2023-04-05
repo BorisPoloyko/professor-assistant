@@ -7,15 +7,15 @@ using TelegramBot.Services.Interfaces.Dialogs.DialogStates;
 
 namespace TelegramBot.Services.Implementations.Dialogs.DialogStates.StartCommandState
 {
-    public class UserEntersFirstNameState : IStartCommandState
+    public class UserEntersFirstNameState : IDialogState<InitializeUserDialog>
     {
-        public ITelegramBotClient Bot { get; }
-        public StudentsClient StudentClient { get; }
+        private readonly ITelegramBotClient _bot;
+        private readonly StudentsClient _studentClient;
 
-        public UserEntersFirstNameState(ITelegramBotClient client, StudentsClient studentClient)
+        public UserEntersFirstNameState(StudentsClient studentClient, ITelegramBotClient bot)
         {
-            Bot = client;
-            StudentClient = studentClient;
+            _studentClient = studentClient;
+            _bot = bot;
         }
 
         public async Task Handle(InitializeUserDialog? dialog, Message message)
@@ -28,11 +28,11 @@ namespace TelegramBot.Services.Implementations.Dialogs.DialogStates.StartCommand
             var firstName = message.Text;
             dialog.FirstName = firstName;
 
-            await Bot.SendTextMessageAsync(dialog.UserId, "Please enter your last name");
-            dialog.State = new UserEntersLastNameState(Bot, StudentClient);
+            await _bot.SendTextMessageAsync(dialog.UserId, "Please enter your last name");
+            dialog.State = new UserEntersLastNameState(_studentClient, _bot);
         }
 
-        Task IDialogState.Handle(Dialog dialog, Message message)
+        Task IDialogState.Handle(IDialog dialog, Message message)
         {
             return Handle(dialog as InitializeUserDialog, message);
         }
