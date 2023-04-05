@@ -1,9 +1,13 @@
 using Microsoft.Extensions.Options;
 using Serilog;
 using Telegram.Bot;
+using TelegramBot.Middlewares;
 using TelegramBot.Model.Configurations;
+using TelegramBot.Services.Implementations.Dialogs;
+using TelegramBot.Services.Implementations.HttpClients;
 using TelegramBot.Services.Implementations.Requests;
 using TelegramBot.Services.Implementations.Webhook;
+using TelegramBot.Services.Interfaces.Dialogs;
 using TelegramBot.Services.Interfaces.Requests;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,13 +31,34 @@ builder.Services
 
     return new TelegramBotClient(botClientOptions, client);
 });
-builder.Services.AddTransient<IRequestFactory, RequestFactory>();
+
+
+var studentsClient = builder.Services.AddHttpClient<StudentsClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Clients:Identity:BaseUrl"]);
+});
+
+if (builder.Environment.IsDevelopment())
+{
+    studentsClient.ConfigureHttpMessageHandlerBuilder(handlerBuilder =>
+    {
+        handlerBuilder.PrimaryHandler = new HttpClientHandler
+        {
+            ClientCertificateOptions = ClientCertificateOption.Manual,
+            ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+        };
+    });
+}
+
+builder.Services.AddTransient<IDialogFactory, DialogFactory>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddHostedService<StartupService>();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
 app.MapControllers();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Run();

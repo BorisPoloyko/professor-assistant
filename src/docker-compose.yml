@@ -2,6 +2,7 @@ version: '3.4'
 
 services:
   telegrambot:
+    container_name: telegrambot
     image: ${DOCKER_REGISTRY-}telegrambot
     ports:
       - 32774:443
@@ -13,6 +14,7 @@ services:
       context: .
       dockerfile: TelegramBot/Dockerfile
   identity:
+     container_name: identity
      image: ${DOCKER_REGISTRY-}identity
      ports:
       - 32776:443

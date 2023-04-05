@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace TelegramBot.Model.Commands
+namespace TelegramBot.Model.Requests
 {
     public class GetFilesRequest : IRequest
     {
@@ -27,7 +27,7 @@ namespace TelegramBot.Model.Commands
         public string ChatId { get; }
         public string? Username { get; }
 
-        public bool IsAdminComand { get; } = true;
+        public bool IsAdminCommand { get; } = true;
         public bool IsZip { get; }
     }
 }

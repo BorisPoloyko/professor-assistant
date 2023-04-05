@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TelegramBot.Model.Commands;
+using TelegramBot.Model.Requests;
 using TelegramBot.Services.Interfaces.Requests;
 
 namespace TelegramBot.Services.Implementations.Requests
@@ -10,7 +10,7 @@ namespace TelegramBot.Services.Implementations.Requests
 
         public RequestFactory() 
         {
-            _map = new Dictionary<string, Type>()
+            _map = new Dictionary<string, Type>
             {
                 { "files", typeof(GetFilesRequest)}
             };
@@ -20,7 +20,7 @@ namespace TelegramBot.Services.Implementations.Requests
         {
             if (!_map.TryGetValue(command, out var requestType))
             {
-                throw new ArgumentOutOfRangeException($"Unknown command: ", nameof(command));
+                throw new ArgumentOutOfRangeException(nameof(command),"Unknown command" );
             }
 
             var request = Activator.CreateInstance(requestType, arguments) as IRequest;

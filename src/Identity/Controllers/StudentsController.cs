@@ -40,6 +40,27 @@ namespace Identity.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{studentId:long}")]
+        public async Task<ActionResult<Student>> GetStudent(long studentId)
+        {
+            try
+            {
+                var student = await _studentsRepository.FindStudent(studentId);
+
+                if (student == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(student);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPut]
         [Route("{studentId:long}")]
         public async Task<ActionResult> UpdateStudent(Student student)

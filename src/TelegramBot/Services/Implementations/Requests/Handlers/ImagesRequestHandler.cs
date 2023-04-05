@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types;
-using TelegramBot.Model.Commands;
 using Telegram.Bot;
 using System.IO.Compression;
 using TelegramBot.Model.Configurations;
 using Microsoft.Extensions.Options;
+using TelegramBot.Model.Requests;
 
 namespace TelegramBot.Services.Implementations.Requests.Handlers
 {

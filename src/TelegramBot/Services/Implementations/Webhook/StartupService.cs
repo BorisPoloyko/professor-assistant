@@ -22,7 +22,6 @@ namespace TelegramBot.Services.Implementations.Webhook
             using var scope = _serviceProvider.CreateScope();
             var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
             _logger.LogWarning(_botConfigurations.WebhookUrl);
-            var info  = await botClient.GetWebhookInfoAsync(cancellationToken).ConfigureAwait(false);
             await botClient.SetWebhookAsync(_botConfigurations.WebhookUrl, cancellationToken: cancellationToken);
         }
 
