@@ -7,7 +7,7 @@ namespace Identity.DataAccess.Interfaces
     {
         Task AddStudent(Student student);
 
-        Task<Student> FindStudent(long id);
+        Task<Student?> FindStudent(long id);
 
         Task AssignGroup(long studentId, int groupId);
 

@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Identity.DataAccess.Context;
+﻿using Identity.DataAccess.Context;
 using Identity.DataAccess.Interfaces;
 using Identity.Models.Exceptions;
 using Identity.Models.UniversityGroups;

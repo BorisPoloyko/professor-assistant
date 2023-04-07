@@ -15,9 +15,9 @@ namespace Identity.DataAccess.Implementations
             _context = context;
         }
 
-        public async Task<Student> FindStudent(long id)
+        public async Task<Student?> FindStudent(long id)
         {
-            return await _context.Students.FindAsync(id);
+            return await _context.Students.Include(x => x.Group).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task Update(Student student)
@@ -51,9 +51,10 @@ namespace Identity.DataAccess.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddStudent(Student student)
+        public Task AddStudent(Student student)
         {
             _context.Students.Add(student);
+            return Task.CompletedTask; 
         }
 
         public async Task AssignGroup(long studentId, int groupId)
