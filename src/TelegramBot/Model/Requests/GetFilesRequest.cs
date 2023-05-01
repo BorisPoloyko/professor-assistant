@@ -1,21 +1,9 @@
 ﻿using MediatR;
-using Telegram.Bot.Types;
 
-namespace TelegramBot.Model.Commands
+namespace TelegramBot.Model.Requests
 {
     public class GetFilesRequest : IRequest
     {
-        private GetFilesRequest(string chatId, string username)
-        {
-            if (string.IsNullOrEmpty(chatId))
-            {
-                throw new ArgumentNullException(nameof(chatId));
-            }
-
-            ChatId = chatId;
-            Username = username;
-        }
-
         public GetFilesRequest(IReadOnlyList<string> args)
         {
             if (args.Count != 3 && args.Count != 2)
@@ -39,7 +27,7 @@ namespace TelegramBot.Model.Commands
         public string ChatId { get; }
         public string? Username { get; }
 
-        public bool IsAdminComand { get; } = true;
+        public bool IsAdminCommand { get; } = true;
         public bool IsZip { get; }
     }
 }

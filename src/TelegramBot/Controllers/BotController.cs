@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
-using TelegramBot.Services.Implementations.Requests;
-using TelegramBot.Services.Interfaces.Requests;
+using Telegram.Bot.Types.Enums;
+using TelegramBot.Services.Implementations.Dialogs;
+using TelegramBot.Services.Implementations.Dialogs.DialogStates.StartCommandState;
+using TelegramBot.Services.Interfaces.Dialogs;
 
 namespace TelegramBot.Controllers
 {
@@ -14,100 +14,112 @@ namespace TelegramBot.Controllers
     public class BotController : ControllerBase
     {
         private readonly ITelegramBotClient _bot;
-        private readonly IMediator _mediator;
         private readonly ILogger<BotController> _logger;
-        private readonly IRequestFactory _requestFactory;
+        private readonly IDialogFactory _dialogFactory;
 
-        public BotController(ITelegramBotClient bot, IMediator mediator, ILogger<BotController> logger, IRequestFactory requestFactory)
+        public BotController(ITelegramBotClient bot,
+            ILogger<BotController> logger,
+            IDialogFactory dialogFactory)
         {
             _bot = bot;
-            _mediator = mediator;
             _logger = logger;
-            _requestFactory = requestFactory;
+            _dialogFactory = dialogFactory;
         }
 
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] Update update, CancellationToken cancellationToken)
         {
-            try
+            ValidateUpdateRequest(update);
+
+            var senderId = update.Message!.From!.Id;
+            HttpContext.Items["userId"] = senderId;
+            if (!string.IsNullOrEmpty(update.Message!.Text))
             {
-                _logger.LogInformation("Received update: {}");
-                switch (update.Type)
+                var text = update.Message.Text;
+                if (text.StartsWith("/"))
                 {
-                    // refactor towards service
-                    case Telegram.Bot.Types.Enums.UpdateType.Message when
-                    !string.IsNullOrEmpty(update.Message?.Text) &&
-                    update.Message?.From?.Id != null:
-                        var (commandName, args) = ParseCommand(update.Message.Text, update.Message.From.Id);
-                        var request = _requestFactory.Create(commandName, args);
-                        await _mediator.Send(request);
-                        break;
-                    case Telegram.Bot.Types.Enums.UpdateType.Message when
-                        update.Message.Photo != null:
-                        {
-                            var fileId = update.Message.Photo.Last().FileId;
-                            var fileInfo = await _bot.GetFileAsync(fileId);
-                            var filePath = fileInfo.FilePath;
-                            var photoFormat = fileInfo.FilePath.Split(".")[1];
-                            var destination = $"/app/photos/{fileInfo.FileUniqueId}_{update.Message.From.Id}";
-                            await using Stream fileStream = System.IO.File.OpenWrite(destination);
-                            await _bot.DownloadFileAsync(
-                                filePath: filePath,
-                                destination: fileStream,
-                                cancellationToken: cancellationToken);
-                            await _bot.SendTextMessageAsync(update.Message.From.Id, "Photo received");
-                            break;
-                        }
-                    case Telegram.Bot.Types.Enums.UpdateType.Message when
-                    update.Message.Document != null:
-                        {
-                            var fileId = update.Message.Document.FileId;
-                            var fileInfo = await _bot.GetFileAsync(fileId);
-                            var filePath = fileInfo.FilePath;
-                            var photoFormat = fileInfo.FilePath.Split(".")[1];
-                            var destination = $"/app/photos/{fileInfo.FileUniqueId}_{update.Message.From.Id}";
-                            await using Stream fileStream = System.IO.File.OpenWrite(destination);
-                            await _bot.DownloadFileAsync(
-                                filePath: filePath,
-                                destination: fileStream,
-                                cancellationToken: cancellationToken);
-                            await _bot.SendTextMessageAsync(update.Message.From.Id, "File received");
-                            break;
-                        }
-                    default:
-                        throw new ArgumentOutOfRangeException("Unable to parse update");
+                    var commandName = ParseCommand(update.Message.Text);
+                    var newDialog = _dialogFactory.Create(commandName, senderId);
+                    await newDialog.Handle(update.Message);
                 }
+                else
+                {
+                    var dialog = _dialogFactory.Extract(senderId);
+                    await dialog.Handle(update.Message);
+                }
+
             }
-            catch (Exception e)
+            else if (update.Message!.Photo != null)
             {
-                _logger.LogError(e, "Error");
-                _logger.LogError("Unable to process user message: {0}", update);
-                var chatId = update.Message?.From?.Id ?? update.EditedMessage?.From?.Id;
-                await _bot.SendTextMessageAsync(chatId, "Not supported message");
+                var fileId = update.Message.Photo.Last().FileId;
+                var fileInfo = await _bot.GetFileAsync(fileId);
+                var filePath = fileInfo.FilePath;
+                var photoFormat = fileInfo.FilePath.Split(".")[1];
+                var destination = $"/app/photos/{fileInfo.FileUniqueId}_{update.Message.From.Id}";
+                await using Stream fileStream = System.IO.File.OpenWrite(destination);
+                await _bot.DownloadFileAsync(
+                    filePath: filePath,
+                    destination: fileStream,
+                    cancellationToken: cancellationToken);
+                await _bot.SendTextMessageAsync(update.Message.From.Id, "Photo received");
+            }
+            else if (update.Message.Document != null)
+            {
+                var fileId = update.Message.Document.FileId;
+                var fileInfo = await _bot.GetFileAsync(fileId);
+                var filePath = fileInfo.FilePath;
+                var photoFormat = fileInfo.FilePath.Split(".")[1];
+                var destination = $"/app/photos/{fileInfo.FileUniqueId}_{update.Message.From.Id}";
+                await using Stream fileStream = System.IO.File.OpenWrite(destination);
+                await _bot.DownloadFileAsync(
+                    filePath: filePath,
+                    destination: fileStream,
+                    cancellationToken: cancellationToken);
+                await _bot.SendTextMessageAsync(update.Message.From.Id, "File received");
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(update),"Not supported data format.");
             }
 
             return Ok();
         }
 
+        /// <summary>
+        /// Testing endpoint that indicates that the application is running
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Hello(CancellationToken cancellationToken)
         {
             return Ok("Hello");
         }
-        // move to another service
-        private (string commandName, IReadOnlyCollection<string> commandArgs) ParseCommand(string text, long fromId)
+
+        private void ValidateUpdateRequest(Update update)
         {
-            if (!text.StartsWith("/"))
+            if (update.Type != UpdateType.Message || update.Message == null)
             {
-                throw new ArgumentOutOfRangeException("Only commands are supported");
+                throw new ArgumentOutOfRangeException(nameof(update), "Only not empty messages are allowed.");
             }
 
+            if (update.Message?.From?.Id == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(update), "Cannot determine the sender.");
+            }
+        }
+
+        // move to another service
+        private string ParseCommand(string text)
+        {
             var command = text.Split();
-            var commandName = command.First()[1..];
-            var arguments = command.Skip(1);
-            var args = new List<string> { fromId.ToString() };
-            args.AddRange(arguments);
-            return (commandName, args);
+            if (command.Length > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(command), "Arguments are not supported");
+            }
+
+            var commandName = text[1..];
+            return commandName;
         }
     }
 }

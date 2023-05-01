@@ -2,20 +2,53 @@ version: '3.4'
 
 services:
   telegrambot:
+    container_name: telegrambot
     image: ${DOCKER_REGISTRY-}telegrambot
     ports:
       - 32774:443
       - 32775:80
     volumes:
-      - TelegramBotLogs:/app/logs
-      - TelegramBotPhotos:/app/photos
+      - telegramBotLogs:/app/logs
+      - telegramBotPhotos:/app/photos
     build:
       context: .
       dockerfile: TelegramBot/Dockerfile
+  identity:
+     container_name: identity
+     image: ${DOCKER_REGISTRY-}identity
+     ports:
+      - 32776:443
+      - 32777:80
+     build:
+      context: .
+      dockerfile: Identity/Dockerfile
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+    - POSTGRES_PASSWORD=password
+    volumes:
+    - postgresData:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: boris.poloiko@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - pgadminData:/var/lib/pgadmin
 volumes:
-  TelegramBotLogs:
+  telegramBotLogs:
     external: true
     name: TelegramBotLogs  
-  TelegramBotPhotos:
+  telegramBotPhotos:
     external: true
-    name: TelegramBotPhotos  
+    name: TelegramBotPhotos
+  postgresData:
+    external: true
+    name: PostgresData
+  pgadminData:
