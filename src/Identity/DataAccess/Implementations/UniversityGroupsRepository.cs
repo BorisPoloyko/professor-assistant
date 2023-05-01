@@ -16,11 +16,11 @@ namespace Identity.DataAccess.Implementations
         }
 
         // refactor towards more general filter
-        public async Task<UniversityGroup> FindUniversityGroup(FindUniversityGroupsQuery? filter)
+        public async Task<IEnumerable<UniversityGroup>> FindUniversityGroups(FindUniversityGroupsQuery? filter)
         {
             var filteredGroups = BuildFilterQuery(filter);
 
-            return await filteredGroups.AsNoTracking().SingleOrDefaultAsync();
+            return await filteredGroups.AsNoTracking().ToArrayAsync();
         }
 
         public Task CreateGroup(UniversityGroup group)

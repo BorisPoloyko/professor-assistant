@@ -17,12 +17,12 @@ namespace Identity.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<UniversityGroup>> GetGroup([FromQuery] FindUniversityGroupsQuery query)
+        public async Task<ActionResult<UniversityGroup>> GetGroups([FromQuery] FindUniversityGroupsQuery query)
         {
             try
             {
-                var group = await _repository.FindUniversityGroup(query);
-                return Ok(group);
+                var groups = await _repository.FindUniversityGroups(query);
+                return Ok(groups);
             }
             catch (Exception ex)
             {

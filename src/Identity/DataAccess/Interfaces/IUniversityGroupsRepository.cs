@@ -4,7 +4,7 @@ namespace Identity.DataAccess.Interfaces
 {
     public interface IUniversityGroupsRepository
     {
-        Task<UniversityGroup> FindUniversityGroup(FindUniversityGroupsQuery filter);
+        Task<IEnumerable<UniversityGroup>> FindUniversityGroups(FindUniversityGroupsQuery filter);
         Task CreateGroup(UniversityGroup group);
         Task DeleteGroup(long groupId);
 

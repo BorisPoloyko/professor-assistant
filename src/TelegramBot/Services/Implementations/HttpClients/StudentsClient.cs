@@ -40,15 +40,5 @@ namespace TelegramBot.Services.Implementations.HttpClients
                 }
             }
         }
-
-        public async Task UpdateStudent(StudentDto student)
-        {
-            var request = await _httpClient.PutAsync($"/api/students/{student.Id}", JsonContent.Create(new
-            {
-                student.FirstName,
-                student.LastName
-            }));
-            request.EnsureSuccessStatusCode();
-        }
     }
 }

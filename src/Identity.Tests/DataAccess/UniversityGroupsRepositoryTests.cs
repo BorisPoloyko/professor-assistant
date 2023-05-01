@@ -74,9 +74,9 @@ namespace Identity.Tests.DataAccess
                 Group = 9
             };
 
-            var group = await repository.FindUniversityGroup(filter);
+            var group = await repository.FindUniversityGroups(filter);
 
-            Assert.Equal(group.Group, 9);
+            Assert.Equal(group.FirstOrDefault().Group, 9);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Identity.Tests.DataAccess
                 University = "BSU"
             };
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async ()=> await repository.FindUniversityGroup(filter));
+            await Assert.ThrowsAsync<InvalidOperationException>(async ()=> await repository.FindUniversityGroups(filter));
         }
     }
 }

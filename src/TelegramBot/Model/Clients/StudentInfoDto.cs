@@ -2,6 +2,6 @@
 {
     public record StudentInfoDto : StudentDto
     {
-        public UniversityGroupDto? UniversityGroup { get; set; }
+        public UniversityGroupDto? Group { get; set; }
     }
 }
