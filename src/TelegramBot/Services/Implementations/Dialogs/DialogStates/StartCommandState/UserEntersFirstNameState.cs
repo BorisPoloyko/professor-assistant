@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramBot.Services.Implementations.HttpClients;
+using TelegramBot.Services.Implementations.Clients;
 using TelegramBot.Services.Interfaces.Dialogs;
 using TelegramBot.Services.Interfaces.Dialogs.DialogStates;
 

@@ -13,6 +13,10 @@ services:
     build:
       context: .
       dockerfile: TelegramBot/Dockerfile
+    environment:
+      - AZURE_CLIENT_ID=9b5c4000-13d7-4c8e-aa9d-673894a2cb1b
+      - AZURE_TENANT_ID=61a74b3d-1188-4c57-aed0-4171e8500298
+      - AZURE_CLIENT_SECRET=wZA8Q~vyMHGS.U4m3-lKqj66oZLjX-uanJoBwbrv
   identity:
      container_name: identity
      image: ${DOCKER_REGISTRY-}identity

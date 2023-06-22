@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramBot.Model.Clients;
-using TelegramBot.Services.Implementations.HttpClients;
+using TelegramBot.Services.Interfaces.Clients;
 using TelegramBot.Services.Interfaces.Dialogs;
 using TelegramBot.Services.Interfaces.Dialogs.DialogStates;
 

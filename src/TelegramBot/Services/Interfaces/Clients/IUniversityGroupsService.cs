@@ -1,6 +1,6 @@
 ﻿using TelegramBot.Model.Clients;
 
-namespace TelegramBot.Services.Implementations.HttpClients;
+namespace TelegramBot.Services.Interfaces.Clients;
 
 public interface IUniversityGroupsService
 {

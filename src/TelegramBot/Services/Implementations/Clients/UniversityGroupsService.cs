@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using TelegramBot.Model.Clients;
+using TelegramBot.Services.Interfaces.Clients;
 
-namespace TelegramBot.Services.Implementations.HttpClients
+namespace TelegramBot.Services.Implementations.Clients
 {
     public class UniversityGroupsService : IUniversityGroupsService
     {

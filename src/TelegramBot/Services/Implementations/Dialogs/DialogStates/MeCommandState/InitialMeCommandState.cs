@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramBot.Services.Implementations.HttpClients;
+using TelegramBot.Services.Implementations.Clients;
 using TelegramBot.Services.Interfaces.Dialogs;
 using TelegramBot.Services.Interfaces.Dialogs.DialogStates;
 
@@ -26,8 +26,15 @@ namespace TelegramBot.Services.Implementations.Dialogs.DialogStates.MeCommandSta
 
             var student = await _studentClient.GetStudentInfo(dialog.UserId);
 
-            await _bot.SendTextMessageAsync(dialog.UserId, $"Your profile: {student}");
-
+            if (student == null)
+            {
+                await _bot.SendTextMessageAsync(dialog.UserId, "Unable to fetch user data.");
+            }
+            else
+            {
+                await _bot.SendTextMessageAsync(dialog.UserId, $"Subject:{student.FirstName} {student.LastName}\nFaculty:{student.Group?.Faculty}, course: {student.Group?.Course ?? null}, group:{student.Group?.Group}");
+            }
+            
             dialog.State = null;
         }
 

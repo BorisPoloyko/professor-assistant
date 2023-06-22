@@ -2,7 +2,7 @@
 using System.Text.Json;
 using TelegramBot.Model.Clients;
 
-namespace TelegramBot.Services.Implementations.HttpClients
+namespace TelegramBot.Services.Implementations.Clients
 {
     public class StudentsClient
     {
