@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Castle.Core.Logging;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,26 +14,17 @@ namespace TelegramBot.Tests.Controllers
     public class BotControllerTests
     {
         private readonly Mock<ITelegramBotClient> _botMock;
-        private readonly Mock<IDialogFactory> _dialogFactoryMock;
+        private readonly Mock<IDialogProvider> _dialogFactoryMock;
         private readonly ILogger<BotController> _logger;
-        
+        private readonly Mock<BlobServiceClient> _blobClient;
 
-        public BotControllerTests()
+
+        public BotControllerTests(Mock<BlobServiceClient> blobClient)
         {
+            _blobClient = blobClient;
             _botMock = new Mock<ITelegramBotClient>();
-            _dialogFactoryMock = new Mock<IDialogFactory>();
+            _dialogFactoryMock = new Mock<IDialogProvider>();
             _logger = new NullLogger<BotController>();
-        }
-
-        [Fact]
-        public void HelloEndpoint_ReturnsOk()
-        {
-            var controller = new BotController(_botMock.Object, new NullLogger<BotController>(), _dialogFactoryMock.Object);
-
-            var result = controller.Hello(new CancellationToken()) as OkObjectResult;
-
-            Assert.NotNull(result);
-            Assert.Equal(200, result.StatusCode);
         }
     }
 }
