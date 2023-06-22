@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using TelegramBot.Services.Implementations.HttpClients;
+using TelegramBot.Services.Implementations.Clients;
 
 namespace TelegramBot.Services.Implementations.BackgroundServices
 {

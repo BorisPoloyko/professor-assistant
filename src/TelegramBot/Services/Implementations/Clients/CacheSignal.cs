@@ -1,4 +1,4 @@
-﻿namespace TelegramBot.Services.Implementations.HttpClients
+﻿namespace TelegramBot.Services.Implementations.Clients
 {
     public class CacheSignal<T>
     {

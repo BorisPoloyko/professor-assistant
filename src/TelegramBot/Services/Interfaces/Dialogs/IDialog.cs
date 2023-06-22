@@ -9,7 +9,7 @@ namespace TelegramBot.Services.Interfaces.Dialogs
         IDialogState? State { get; set; }
         public long UserId { get; }
 
-        public async Task<bool> Handle(Message message)
+        async Task<bool> Handle(Message message)
         {
             if (State == null)
             {

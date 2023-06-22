@@ -2,9 +2,10 @@
 using Moq;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using TelegramBot.Services.Implementations.Clients;
 using TelegramBot.Services.Implementations.Dialogs;
 using TelegramBot.Services.Implementations.Dialogs.DialogStates.StartCommandState;
-using TelegramBot.Services.Implementations.HttpClients;
+using TelegramBot.Services.Interfaces.Dialogs;
 
 namespace TelegramBot.Tests.Dialogs
 {
@@ -27,7 +28,7 @@ namespace TelegramBot.Tests.Dialogs
         public async Task Handle_DialogInitialized_ChainOfStateExecuted()
         {
             var startState = new InitialStartCommandState(_botClientMock.Object, _studentsClientMock.Object);
-            var dialog = new InitializeUserDialog(_userId, startState, _memoryCache);
+            IDialog dialog = new InitializeUserDialog(_userId, startState, _memoryCache);
             var message = new Message();
 
             await dialog.Handle(message);
@@ -47,7 +48,7 @@ namespace TelegramBot.Tests.Dialogs
         public async Task Handle_DialogInitialized_TelegramBotCalled()
         {
             var startState = new InitialStartCommandState(_botClientMock.Object, _studentsClientMock.Object);
-            var dialog = new InitializeUserDialog(_userId, startState, _memoryCache);
+            IDialog dialog = new InitializeUserDialog(_userId, startState, _memoryCache);
             var message = new Message();
 
             await dialog.Handle(message);
@@ -66,8 +67,8 @@ namespace TelegramBot.Tests.Dialogs
         [Fact]
         public async Task Handle_HasNoState_ExceptionIsThrown()
         {
-            var startState = new UserEntersLastNameState(_botClientMock.Object, _studentsClientMock.Object);
-            var dialog = new InitializeUserDialog(_userId, startState, _memoryCache);
+            var startState = new UserEntersLastNameState(_studentsClientMock.Object, _botClientMock.Object);
+            IDialog dialog = new InitializeUserDialog(_userId, startState, _memoryCache);
             var message = new Message();
 
             await dialog.Handle(message);

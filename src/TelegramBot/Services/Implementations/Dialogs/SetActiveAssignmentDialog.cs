@@ -1,24 +1,20 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using Telegram.Bot.Types;
 using TelegramBot.Services.Interfaces.Dialogs;
 using TelegramBot.Services.Interfaces.Dialogs.DialogStates;
 
 namespace TelegramBot.Services.Implementations.Dialogs
 {
-    public class InitializeUserDialog : IDialog
+    public class SetActiveAssignmentDialog : IDialog
     {
         private IDialogState? _state;
-        public InitializeUserDialog(
-            long userId,
-            IDialogState state,
-            IMemoryCache memoryCache)
+        public SetActiveAssignmentDialog(long userId, IDialogState state, IMemoryCache cache)
         {
-            UserId = userId;
-            Cache = memoryCache; 
+            Cache = cache;
             State = state;
+            UserId = userId;
         }
 
-        public IMemoryCache Cache { get; }
+        public IMemoryCache Cache { get; set; }
 
         public IDialogState? State
         {
@@ -26,15 +22,11 @@ namespace TelegramBot.Services.Implementations.Dialogs
             set
             {
                 _state = value;
-                Cache.Set($"{UserId}_dialog", 
+                Cache.Set($"{UserId}_dialog",
                     this);
             }
         }
-
+        
         public long UserId { get; }
-
-        public string? FirstName { get; set; }
-
-        public string? LastName { get; set; }
     }
 }
